@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard — URL Guard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <!-- Firebase CDN and init -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="js/firebase.js"></script>
+</head>
+<body>
+  <div class="dashboard">
+    <nav class="dash-nav">
+      <div class="logo">URL Guard</div>
+      <div class="nav-right">
+        <span id="userEmail" class="muted small"></span>
+        <button id="logoutBtn" class="btn btn-ghost">Logout</button>
+      </div>
+    </nav>
+
+    <main class="dash-main">
+      <h1>URL Checker Dashboard</h1>
+      <p class="muted">Check URLs safely — demo analysis (client-side).</p>
+
+      <section class="card-grid">
+        <div class="card">
+          <h3>Check a URL</h3>
+          <p class="muted small">Enter any URL and click Analyze</p>
+          <input id="checkInput" type="text" placeholder="https://example.com">
+          <button id="analyzeBtn" class="btn btn-gradient">Analyze</button>
+          <div id="checkResult" class="result-box muted"></div>
+        </div>
+
+        <div class="card">
+          <h3>Telegram Bot</h3>
+          <p class="muted small">Use our Telegram bot to check URLs (demo link).</p>
+          <a class="btn btn-outline" href="https://t.me/URL_Safety_Checker_bot" target="_blank">Open Telegram Bot</a>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/auth.js"></script>
+  <script>
+    // Dashboard-specific behaviors
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      logout();
+    });
+
+    // Simple client-side deterministic URL check (consistent results)
+    function normalizeURL(url) {
+      try {
+        const u = new URL(url);
+        if (u.pathname === '/') u.pathname = '';
+        u.searchParams.sort();
+        return u.toString().toLowerCase().replace(/\/$/, '');
+      } catch (e) {
+        return url.toLowerCase().replace(/\/$/, '');
+      }
+    }
+
+    function hashURL(url) {
+      const n = normalizeURL(url);
+      let h = 0;
+      for (let i=0;i<n.length;i++){ h = ((h<<5)-h)+n.charCodeAt(i); h = h & h; }
+      return Math.abs(h);
+    }
+
+    document.getElementById('analyzeBtn').addEventListener('click', () => {
+      const input = document.getElementById('checkInput').value.trim();
+      const out = document.getElementById('checkResult');
+
+      if (!input) { out.textContent = 'Please enter a URL'; out.style.color = '#333'; return; }
+      try {
+        const urlObj = new URL(input);
+        // demo: detect common bad keywords first
+        const lower = input.toLowerCase();
+        const bad = ['malware','phish','scam','fraud','virus','hack','suspicious'];
+        if (bad.some(b => lower.includes(b))) {
+          out.textContent = '⚠️ Likely unsafe — contains suspicious keywords';
+          out.style.color = '#c0392b';
+          return;
+        }
+        const h = hashURL(input);
+        const safe = h % 10 >= 3; // same deterministic logic as demo
+        if (safe) {
+          out.textContent = '✅ URL appears SAFE (demo analysis)';
+          out.style.color = '#0a8f6e';
+        } else {
+          out.textContent = '⚠️ Possibly UNSAFE (demo analysis)';
+          out.style.color = '#c0392b';
+        }
+      } catch(e) {
+        out.textContent = 'Invalid URL format';
+        out.style.color = '#c0392b';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sign Up — URL Guard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="js/firebase.js"></script>
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-card glass">
+      <h2>Create Account</h2>
+      <p class="muted">Create an account to use the URL Checker dashboard</p>
+
+      <form id="signupForm" onsubmit="return false;">
+        <label class="input-label">Email</label>
+        <input id="signupEmail" type="email" placeholder="you@domain.com" required>
+
+        <label class="input-label">Password</label>
+        <input id="signupPassword" type="password" placeholder="At least 6 characters" required>
+
+        <label class="input-label">Confirm Password</label>
+        <input id="signupPassword2" type="password" placeholder="Confirm password" required>
+
+        <button id="signupBtn" class="btn btn-gradient full">Create Account</button>
+
+        <p class="muted small">Already have an account? <a href="login.html">Login</a></p>
+      </form>
+
+      <div id="signupMsg" class="form-msg"></div>
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
+  <script>
+    document.getElementById('signupBtn').addEventListener('click', () => {
+      const email = document.getElementById('signupEmail').value.trim();
+      const password = document.getElementById('signupPassword').value;
+      const password2 = document.getElementById('signupPassword2').value;
+      signup(email, password, password2);
+    });
+  </script>
+</body>
+</html>

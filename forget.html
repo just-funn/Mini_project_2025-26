@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Reset Password — URL Guard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="js/firebase.js"></script>
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-card glass">
+      <h2>Forgot Password</h2>
+      <p class="muted">Enter your email and we'll send a reset link.</p>
+
+      <label class="input-label">Email</label>
+      <input id="resetEmail" type="email" placeholder="you@domain.com" required>
+
+      <button id="resetBtn" class="btn btn-gradient full">Send Reset Link</button>
+
+      <p class="muted small">You will receive a password reset email with further instructions.</p>
+      <div id="resetMsg" class="form-msg"></div>
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
+  <script>
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      const email = document.getElementById('resetEmail').value.trim();
+      forgotPassword(email);
+    });
+  </script>
+</body>
+</html>

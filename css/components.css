@@ -1,0 +1,8 @@
+/* components.css - more component styling such as inputs and small helpers */
+input{font-size:1rem;outline:none}
+input:focus{box-shadow:0 8px 18px rgba(14,84,139,0.06);border-color:var(--accent)}
+
+.spread{display:flex;gap:8px}
+
+.muted.small{color:#6d7e8f}
+.center{text-align:center}
