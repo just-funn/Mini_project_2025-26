@@ -8,8 +8,8 @@
   --bg-2: #0a1224;         /* main page background */
   --panel: #071229;        /* card backgrounds */
   --glass: rgba(255,255,255,0.03);
-  --primary: #1534be;
-  --accent: #1078b0;
+  --primary: #1e90ff;
+  --accent: #4cc0ff;
   --muted: #9fb3c8;
   --text: #dfeeff;
   --success: #46d38a;
@@ -62,7 +62,7 @@ body{
 
 /* hero */
 .hero{display:grid;grid-template-columns:1fr 420px;gap:28px;align-items:center;margin-top:28px}
-/* .hero-left{} */
+.hero-left{}
 .hero-right{display:flex;flex-direction:column;align-items:center;gap:18px}
 
 /* typography */
