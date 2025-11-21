@@ -3,107 +3,141 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dashboard — URL Guard</title>
+  <title>Dashboard — URL Checker</title>
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/global.css">
   <link rel="stylesheet" href="css/components.css">
 
-  <!-- Firebase CDN and init -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="js/firebase.js"></script>
+  <script src="js/ui.js" defer></script>
+  <script src="js/firebase.js" defer></script>
+  <script src="js/auth.js" defer></script>
 </head>
-<body>
-  <div class="dashboard">
-    <nav class="dash-nav">
-      <div class="logo">URL Guard</div>
-      <div class="nav-right">
-        <span id="userEmail" class="muted small"></span>
-        <button id="logoutBtn" class="btn btn-ghost">Logout</button>
-      </div>
-    </nav>
+<body class="page-dashboard">
+  <nav class="dash-nav container ani" data-animate-delay="80">
+    <div class="brand">
+      <div class="logo">URL Checker</div>
+      <div class="tag muted small">Dashboard</div>
+    </div>
 
-    <main class="dash-main">
+    <div class="nav-right">
+      <span id="userEmail" class="muted small"></span>
+      <button id="logoutBtn" class="btn btn-ghost" data-ripple>Logout</button>
+    </div>
+  </nav>
+
+  <main class="dash-main container">
+    <header class="dash-header ani" data-animate-delay="160">
       <h1>URL Checker Dashboard</h1>
-      <p class="muted">Check URLs safely — demo analysis (client-side).</p>
+      <p class="muted">Analyze suspicious links safely. This is a local-demo analysis (no backend).</p>
+    </header>
 
-      <section class="card-grid">
-        <div class="card">
-          <h3>Check a URL</h3>
-          <p class="muted small">Enter any URL and click Analyze</p>
-          <input id="checkInput" type="text" placeholder="https://example.com">
-          <button id="analyzeBtn" class="btn btn-gradient">Analyze</button>
-          <div id="checkResult" class="result-box muted"></div>
+    <section class="card-grid">
+      <div class="card fade-in" aria-live="polite">
+        <h3>Check a URL</h3>
+        <p class="muted small">Enter a URL and click Analyze (demo deterministic result).</p>
+        <input id="checkInput" type="text" placeholder="https://example.com" style="margin-top:12px">
+        <div style="display:flex;gap:12px;margin-top:12px">
+          <button id="analyzeBtn" class="btn btn-gradient" data-ripple>Analyze</button>
+          <button id="saveBtn" class="btn btn-outline" data-ripple>Save (local)</button>
         </div>
+        <div id="checkResult" class="result-box muted"></div>
+      </div>
 
-        <div class="card">
-          <h3>Telegram Bot</h3>
-          <p class="muted small">Use our Telegram bot to check URLs (demo link).</p>
-          <a class="btn btn-outline" href="https://t.me/URL_Safety_Checker_bot" target="_blank">Open Telegram Bot</a>
+      <div class="card fade-in">
+        <h3>Telegram Bot</h3>
+        <p class="muted small">Demo link — click to open the bot interface.</p>
+        <a class="btn btn-outline" href="https://t.me/URL_Safety_Checker_bot" target="_blank" data-ripple>Open Bot</a>
+
+        <div class="mt-12">
+          <h4>Recent Checks</h4>
+          <div id="recentList" class="mt-8"></div>
         </div>
-      </section>
-    </main>
-  </div>
-
-  <!-- new UI micro-interactions (animations, ripple, parallax) -->
-<script src="js/ui.js"></script>
-
-<!-- keep this after ui.js so auth handlers still work -->
-<script src="js/auth.js"></script>
+      </div>
+    </section>
+  </main>
 
   <script>
-    // Dashboard-specific behaviors
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      logout();
-    });
+    // Dashboard auth-guard behaviour: logout button + display email + local saved list
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('logoutBtn').addEventListener('click', () => logout());
 
-    // Simple client-side deterministic URL check (consistent results)
-    function normalizeURL(url) {
-      try {
-        const u = new URL(url);
-        if (u.pathname === '/') u.pathname = '';
-        u.searchParams.sort();
-        return u.toString().toLowerCase().replace(/\/$/, '');
-      } catch (e) {
-        return url.toLowerCase().replace(/\/$/, '');
+      // analyze demo
+      function normalizeURL(url) {
+        try {
+          const u = new URL(url);
+          if (u.pathname === '/') u.pathname = '';
+          u.searchParams.sort();
+          return u.toString().toLowerCase().replace(/\/$/, '');
+        } catch (e) {
+          return url.toLowerCase().replace(/\/$/, '');
+        }
       }
-    }
+      function hashURL(url) {
+        const n = normalizeURL(url);
+        let h = 0;
+        for (let i=0;i<n.length;i++){ h = ((h<<5)-h)+n.charCodeAt(i); h = h & h; }
+        return Math.abs(h);
+      }
 
-    function hashURL(url) {
-      const n = normalizeURL(url);
-      let h = 0;
-      for (let i=0;i<n.length;i++){ h = ((h<<5)-h)+n.charCodeAt(i); h = h & h; }
-      return Math.abs(h);
-    }
-
-    document.getElementById('analyzeBtn').addEventListener('click', () => {
-      const input = document.getElementById('checkInput').value.trim();
       const out = document.getElementById('checkResult');
+      document.getElementById('analyzeBtn').addEventListener('click', () => {
+        const input = document.getElementById('checkInput').value.trim();
+        if (!input) { out.textContent = 'Please enter a URL'; out.style.color = ''; return; }
+        try {
+          const urlObj = new URL(input);
+          const lower = input.toLowerCase();
+          const bad = ['malware','phish','scam','fraud','virus','hack','suspicious'];
+          if (bad.some(b => lower.includes(b))) {
+            out.textContent = '⚠️ Likely unsafe — contains suspicious keywords';
+            out.style.color = 'var(--danger)';
+            return;
+          }
+          const h = hashURL(input);
+          const safe = h % 10 >= 3;
+          if (safe) {
+            out.textContent = '✅ URL appears SAFE (demo analysis)';
+            out.style.color = 'var(--success)';
+          } else {
+            out.textContent = '⚠️ Possibly UNSAFE (demo analysis)';
+            out.style.color = 'var(--danger)';
+          }
+        } catch(e) {
+          out.textContent = 'Invalid URL format';
+          out.style.color = 'var(--danger)';
+        }
+      });
 
-      if (!input) { out.textContent = 'Please enter a URL'; out.style.color = '#333'; return; }
-      try {
-        const urlObj = new URL(input);
-        // demo: detect common bad keywords first
-        const lower = input.toLowerCase();
-        const bad = ['malware','phish','scam','fraud','virus','hack','suspicious'];
-        if (bad.some(b => lower.includes(b))) {
-          out.textContent = '⚠️ Likely unsafe — contains suspicious keywords';
-          out.style.color = '#c0392b';
-          return;
-        }
-        const h = hashURL(input);
-        const safe = h % 10 >= 3; // same deterministic logic as demo
-        if (safe) {
-          out.textContent = '✅ URL appears SAFE (demo analysis)';
-          out.style.color = '#0a8f6e';
-        } else {
-          out.textContent = '⚠️ Possibly UNSAFE (demo analysis)';
-          out.style.color = '#c0392b';
-        }
-      } catch(e) {
-        out.textContent = 'Invalid URL format';
-        out.style.color = '#c0392b';
+      // save to localStorage
+      document.getElementById('saveBtn').addEventListener('click', () => {
+        const u = document.getElementById('checkInput').value.trim();
+        if (!u) return;
+        const recent = JSON.parse(localStorage.getItem('urlchecker.recent')||'[]');
+        recent.unshift({ url: u, time: Date.now() });
+        localStorage.setItem('urlchecker.recent', JSON.stringify(recent.slice(0,20)));
+        renderRecent();
+      });
+
+      function renderRecent() {
+        const recent = JSON.parse(localStorage.getItem('urlchecker.recent')||'[]');
+        const el = document.getElementById('recentList');
+        if (!recent.length) { el.innerHTML = '<div class="muted small">No recent checks</div>'; return; }
+        el.innerHTML = recent.map(r => {
+          const d = new Date(r.time);
+          return `<div class="form-border" style="padding:10px;margin-bottom:8px;border-radius:10px">
+            <div style="display:flex;justify-content:space-between">
+              <div style="max-width:70%"><strong>${escapeHtml(r.url)}</strong></div>
+              <div class="muted small">${d.toLocaleString()}</div>
+            </div>
+          </div>`;
+        }).join('');
       }
+
+      function escapeHtml(s){ return s.replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+      renderRecent();
     });
   </script>
 </body>

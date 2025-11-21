@@ -3,94 +3,97 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>URL Guard — Protect Yourself From Fraudulent Links</title>
+  <title>URL Checker — Protect Yourself From Fraudulent Links</title>
 
-  <!-- Google Font -->
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
   <!-- CSS -->
   <link rel="stylesheet" href="css/global.css">
   <link rel="stylesheet" href="css/components.css">
 
-  <!-- Firebase (compat CDN — works with local files) -->
+  <!-- Firebase CDN (compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 
-  <!-- firebase.js must define window.auth and init app -->
-  <script src="js/firebase.js"></script>
+  <!-- UI then Firebase init + auth -->
+  <script src="js/ui.js" defer></script>
+  <script src="js/firebase.js" defer></script>
+  <script src="js/auth.js" defer></script>
 
-  <!-- If already signed-in → redirect to dashboard -->
-  <script>
-    // If user is already logged in, redirect to dashboard (safe local check)
-    document.addEventListener('DOMContentLoaded', () => {
-      if (window.auth) {
-        window.auth.onAuthStateChanged(user => {
-          if (user) {
-            window.location.href = 'dashboard.html';
-          }
-        });
-      }
-    });
-  </script>
 </head>
-<body>
-  <header class="nav-landing">
-    <div class="logo"><h2>URL Checker</h2></div>
-    <div class="nav-actions">
-      <a class="btn btn-ghost" href="login.html">Sign In</a>
-      <a class="btn btn-primary" href="signup.html">Sign Up</a>
+<body class="page-landing">
+  <header class="nav-landing container">
+    <div class="brand">
+      <div class="logo">URL Checker</div>
+      <div class="tag">Protect • Detect • Verify</div>
     </div>
+
+    <nav class="nav-actions">
+      <a class="btn btn-ghost" href="login.html">Sign In</a>
+      <a class="btn btn-primary" href="signup.html" data-ripple>Sign Up</a>
+    </nav>
   </header>
 
-  <main class="hero">
+  <main class="hero container">
     <section class="hero-left">
-      <h1>Protect Yourself From Fraud Links</h1>
-      <p class="lead">This tool helps you analyze suspicious URLs using safe detection methods.</p>
-      <div class="hero-cta">
-        <a class="btn btn-gradient large" href="signup.html">Get Started</a>
+      <h1 class="ani">Protect Yourself From Fraudulent Links</h1>
+      <p class="lead ani" data-animate-delay="80">URL Checker helps you analyze suspicious links locally — secure, private and fast demo analysis.</p>
+
+      <div class="hero-cta ani" data-animate-delay="160">
+        <a class="btn btn-gradient large" href="login.html" data-ripple>Sign In</a>
+        <a class="btn btn-outline large" href="signup.html" data-ripple>Create Account</a>
       </div>
 
       <div class="features-grid">
-        <div class="feature-card">
+        <div class="feature-card ani" data-animate-delay="220">
           <div class="feature-icon">🔒</div>
           <h3>Secure</h3>
-          <p>Best practices for authentication and safe checking.</p>
+          <p class="muted">No server required — your checks stay local.</p>
         </div>
-        <div class="feature-card">
+        <div class="feature-card ani" data-animate-delay="300">
           <div class="feature-icon">⚡</div>
           <h3>Fast</h3>
-          <p>Instant client-side analysis for quick results (demo).</p>
+          <p class="muted">Client-side deterministic checks for quick feedback.</p>
         </div>
-        <div class="feature-card">
-          <div class="feature-icon">✅</div>
-          <h3>Accurate</h3>
-          <p>Consistent demo checks using deterministic logic.</p>
+        <div class="feature-card ani" data-animate-delay="380">
+          <div class="feature-icon">🔍</div>
+          <h3>Transparent</h3>
+          <p class="muted">Easy to read results and logs (localStorage optional).</p>
         </div>
       </div>
     </section>
 
-    <section class="hero-right">
-      <!-- Placeholder illustration -->
+    <aside class="hero-right ani" data-animate-delay="460">
       <div class="illustration">
-        <svg width="420" height="320" viewBox="0 0 420 320" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="illustration">
-          <rect x="0" y="0" width="420" height="320" rx="20" fill="#f5f9ff"/>
-          <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="18" fill="#0f4c75">Illustration Placeholder</text>
+        <!-- decorative illustration (SVG placeholder) -->
+        <svg width="400" height="260" viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="illustration">
+          <defs>
+            <linearGradient id="g1" x1="0" x2="1">
+              <stop offset="0" stop-color="#152238"/>
+              <stop offset="1" stop-color="#0f3b6f"/>
+            </linearGradient>
+          </defs>
+          <rect width="400" height="260" rx="16" fill="url(#g1)"/>
+          <g fill="#9fd3ff" font-family="Inter, Arial" font-size="14">
+            <text x="30" y="56">URL Checker</text>
+            <text x="30" y="90" font-size="12" fill="#cfeeff">Analyze suspicious links safely</text>
+          </g>
         </svg>
       </div>
 
+      <div class="cta-note">
+        <div class="avatar">U</div>
+        <div class="note">
+          <div class="muted small">Built for college projects • Local demo</div>
+        </div>
+      </div>
+
       <footer class="site-footer">
-        <p>© <span id="year"></span> URL Guard • All rights reserved</p>
+        <p>© <span id="year"></span> URL Checker • All rights reserved</p>
       </footer>
-    </section>
+    </aside>
   </main>
-
-
-  <!-- new UI micro-interactions (animations, ripple, parallax) -->
-<script src="js/ui.js"></script>
-
-<!-- keep this after ui.js so auth handlers still work -->
-<script src="js/auth.js"></script>
-
 
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();

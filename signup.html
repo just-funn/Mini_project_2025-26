@@ -3,22 +3,25 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Sign Up — URL Guard</title>
+  <title>Sign Up — URL Checker</title>
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/global.css">
   <link rel="stylesheet" href="css/components.css">
 
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="js/firebase.js"></script>
+  <script src="js/ui.js" defer></script>
+  <script src="js/firebase.js" defer></script>
+  <script src="js/auth.js" defer></script>
 </head>
-<body>
-  <div class="auth-page">
-    <div class="auth-card glass">
-      <h2>Create Account</h2>
-      <p class="muted">Create an account to use the URL Checker dashboard</p>
+<body class="page-auth">
+  <main class="auth-page container">
+    <div class="auth-card not-ready" aria-live="polite">
+      <h2 class="ani">Create Account</h2>
+      <p class="muted ani" data-animate-delay="80">Register to use the URL Checker dashboard</p>
 
-      <form id="signupForm" onsubmit="return false;">
+      <form id="signupForm" class="mt-12" onsubmit="return false;">
         <label class="input-label">Email</label>
         <input id="signupEmail" type="email" placeholder="you@domain.com" required>
 
@@ -28,27 +31,25 @@
         <label class="input-label">Confirm Password</label>
         <input id="signupPassword2" type="password" placeholder="Confirm password" required>
 
-        <button id="signupBtn" class="btn btn-gradient full">Create Account</button>
+        <button id="signupBtn" class="btn btn-gradient full" data-ripple style="margin-top:16px">Create Account</button>
 
-        <p class="muted small">Already have an account? <a href="login.html">Login</a></p>
+        <p class="muted small center mt-12">Already have an account? <a href="login.html">Login</a></p>
       </form>
 
       <div id="signupMsg" class="form-msg"></div>
     </div>
-  </div>
-
-  <!-- new UI micro-interactions (animations, ripple, parallax) -->
-<script src="js/ui.js"></script>
-
-<!-- keep this after ui.js so auth handlers still work -->
-<script src="js/auth.js"></script>
+  </main>
 
   <script>
-    document.getElementById('signupBtn').addEventListener('click', () => {
-      const email = document.getElementById('signupEmail').value.trim();
-      const password = document.getElementById('signupPassword').value;
-      const password2 = document.getElementById('signupPassword2').value;
-      signup(email, password, password2);
+    document.addEventListener('DOMContentLoaded', () => {
+      const card = document.querySelector('.auth-card');
+      setTimeout(() => { card.classList.remove('not-ready'); card.classList.add('animate-up'); }, 80);
+      document.getElementById('signupBtn').addEventListener('click', () => {
+        const email = document.getElementById('signupEmail').value.trim();
+        const password = document.getElementById('signupPassword').value;
+        const password2 = document.getElementById('signupPassword2').value;
+        signup(email, password, password2);
+      });
     });
   </script>
 </body>

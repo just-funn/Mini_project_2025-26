@@ -1,51 +1,28 @@
-/* components.css — supporting components & micro-interactions */
+/* css/components.css — supporting micro components for the dark theme */
 
-/* basic inputs + labels already styled in global.css — add extras here */
+/* label style */
+label.input-label { font-size:0.95rem; color:var(--muted); font-weight:700 }
 
-label.input-label {
-  display:block;
-  margin-bottom:6px;
-  color: #274b63;
-  font-weight:700;
-  font-size:0.95rem;
-}
+/* small avatar */
+.avatar { width:40px; height:40px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; background:linear-gradient(90deg,var(--primary),var(--accent)); color:#02101a; font-weight:800; box-shadow: 0 8px 30px rgba(30,144,255,0.08); }
 
-/* small helper text */
-.muted-link{color:var(--dark); text-decoration:none; font-weight:600;}
-.muted-link:hover{ text-decoration:underline; color:var(--accent) }
-
-/* small cards and tiles */
-.kv { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+/* muted link */
+.muted-link { color:var(--muted); text-decoration:none; font-weight:700; }
+.muted-link:hover{ color:var(--accent); text-decoration:underline; }
 
 /* progress microbar */
-.progress {
-  height:8px; background:#eef6fb; border-radius:999px; overflow:hidden;
-}
-.progress > span {
-  display:block; height:100%; width:40%; background: linear-gradient(90deg,#1e90ff,#3282b8); transition: width 600ms ease;
-  border-radius:999px;
-}
+.progress { height:8px; background:rgba(255,255,255,0.02); border-radius:999px; overflow:hidden; }
+.progress > span { display:block; height:100%; width:40%; background:linear-gradient(90deg,var(--primary),var(--accent)); transition: width 600ms ease; border-radius:999px; }
 
-/* small avatar badge */
-.avatar {
-  width:36px; height:36px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center;
-  background: linear-gradient(180deg,#1e90ff,#3282b8); color:white; font-weight:700;
-  box-shadow:0 6px 18px rgba(14,84,139,0.12);
-}
-
-/* small muted note */
+/* small note */
 .note { font-size:0.9rem; color:var(--muted); margin-top:8px; }
 
-/* for any element we want to animate - small helper to set delay via style attr */
-[data-animate] { opacity:0; transform: translateY(8px); transition: opacity 420ms cubic-bezier(.2,.9,.3,1), transform 420ms cubic-bezier(.2,.9,.3,1); }
-[data-animate].in { opacity:1; transform: translateY(0); }
+/* card-interactive */
+.card-interactive:hover { transform: translateY(-8px); box-shadow: 0 34px 80px rgba(2,10,25,0.7); cursor:pointer; }
 
-/* subtle card hover effect for interactive cards */
-.card-interactive:hover { transform: translateY(-8px); box-shadow: 0 22px 50px rgba(14,84,139,0.12); cursor:pointer; }
+/* ripple animation helper classes included in global.css */
 
-/* tiny subtle borders for forms */
-.form-border { border-radius: 12px; border:1px solid rgba(15,76,117,0.04); padding:10px; background: #fbfdff; }
-
-/* small helpers for mobile spacing */
-.mt-8 { margin-top:8px }
-.mt-12 { margin-top:12px }
+/* helper margin utilities */
+.mt-4{margin-top:4px}
+.mt-10{margin-top:10px}
+.center{text-align:center}

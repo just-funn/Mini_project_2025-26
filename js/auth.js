@@ -1,116 +1,115 @@
-// auth.js
-// All auth-related functions: signup, login, forgot password, logout, auth-guard
-// This file depends on js/firebase.js which should set window.auth (firebase.auth())
+/* js/auth.js
+   Authentication helpers using Firebase Auth (compat).
+   Provides: signup, login, forgotPassword, logout, auth guard.
+   Designed to work locally with Firebase CDN (compat).
+*/
 
-/* Helper: show messages in form message element */
-function showMsg(elId, msg, isError = true) {
-  const el = document.getElementById(elId);
-  if (!el) return;
-  el.textContent = msg;
-  el.style.color = isError ? '#c0392b' : '#0a8f6e';
-  setTimeout(() => { el.textContent = ''; }, 6000);
-}
+(function () {
+  'use strict';
 
-/* SIGNUP */
-function signup(email, password, password2) {
-  if (!window.auth) { showMsg('signupMsg', 'Firebase not initialized. Paste config in js/firebase.js'); return; }
-  if (!email || !password) { showMsg('signupMsg', 'Please enter valid email and password'); return; }
-  if (password.length < 6) { showMsg('signupMsg', 'Password must be at least 6 characters'); return; }
-  if (password !== password2) { showMsg('signupMsg', 'Passwords do not match'); return; }
+  function showMsg(elId, msg, isError = true) {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    el.textContent = msg;
+    el.style.color = isError ? 'var(--danger)' : 'var(--success)';
+    setTimeout(() => { el.textContent = ''; }, 6000);
+  }
 
-  window.auth.createUserWithEmailAndPassword(email, password)
-    .then(cred => {
-      // send email verification optionally
-      if (cred.user && !cred.user.emailVerified) {
-        cred.user.sendEmailVerification().catch(() => {});
-      }
-      showMsg('signupMsg', 'Account created! Redirecting...', false);
-      setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);
-    })
-    .catch(err => {
-      showMsg('signupMsg', err.message || 'Signup failed');
-    });
-}
+  /* SIGNUP */
+  function signup(email, password, password2) {
+    if (!window.auth) { showMsg('signupMsg', 'Firebase not initialized. Paste config in js/firebase.js'); return; }
+    if (!email || !password) { showMsg('signupMsg', 'Please enter valid email and password'); return; }
+    if (password.length < 6) { showMsg('signupMsg', 'Password must be at least 6 characters'); return; }
+    if (password !== password2) { showMsg('signupMsg', 'Passwords do not match'); return; }
 
-/* LOGIN */
-function login(email, password) {
-  if (!window.auth) { showMsg('loginMsg', 'Firebase not initialized. Paste config in js/firebase.js'); return; }
-  if (!email || !password) { showMsg('loginMsg', 'Please enter email and password'); return; }
+    auth.createUserWithEmailAndPassword(email, password)
+      .then(cred => {
+        if (cred.user && !cred.user.emailVerified) {
+          cred.user.sendEmailVerification().catch(()=>{});
+        }
+        showMsg('signupMsg', 'Account created! Redirecting...', false);
+        setTimeout(() => { window.location.href = 'dashboard.html'; }, 900);
+      })
+      .catch(err => {
+        showMsg('signupMsg', err.message || 'Signup failed');
+      });
+  }
 
-  window.auth.signInWithEmailAndPassword(email, password)
-    .then(() => {
-      showMsg('loginMsg', 'Logged in. Redirecting...', false);
-      setTimeout(() => { window.location.href = 'dashboard.html'; }, 600);
-    })
-    .catch(err => {
-      showMsg('loginMsg', err.message || 'Login failed');
-    });
-}
+  /* LOGIN */
+  function login(email, password) {
+    if (!window.auth) { showMsg('loginMsg', 'Firebase not initialized. Paste config in js/firebase.js'); return; }
+    if (!email || !password) { showMsg('loginMsg', 'Please enter email and password'); return; }
 
-/* FORGOT PASSWORD */
-function forgotPassword(email) {
-  if (!window.auth) { showMsg('resetMsg', 'Firebase not initialized. Paste config in js/firebase.js'); return; }
-  if (!email) { showMsg('resetMsg', 'Please enter your email'); return; }
+    auth.signInWithEmailAndPassword(email, password)
+      .then(() => {
+        showMsg('loginMsg', 'Logged in. Redirecting...', false);
+        setTimeout(() => { window.location.href = 'dashboard.html'; }, 700);
+      })
+      .catch(err => {
+        showMsg('loginMsg', err.message || 'Login failed');
+      });
+  }
 
-  window.auth.sendPasswordResetEmail(email)
-    .then(() => {
-      showMsg('resetMsg', 'Reset link sent. Check your email.', false);
-    })
-    .catch(err => {
-      showMsg('resetMsg', err.message || 'Could not send reset email');
-    });
-}
+  /* FORGOT PASSWORD */
+  function forgotPassword(email) {
+    if (!window.auth) { showMsg('resetMsg', 'Firebase not initialized. Paste config in js/firebase.js'); return; }
+    if (!email) { showMsg('resetMsg', 'Please enter your email'); return; }
 
-/* LOGOUT */
-function logout() {
-  if (!window.auth) { console.warn('Firebase not initialized'); return; }
-  window.auth.signOut()
-    .then(() => {
-      window.location.href = 'login.html';
-    })
-    .catch(err => {
-      alert('Logout failed: ' + (err.message || err));
-    });
-}
+    auth.sendPasswordResetEmail(email)
+      .then(() => {
+        showMsg('resetMsg', 'Reset link sent. Check your email.', false);
+      })
+      .catch(err => {
+        showMsg('resetMsg', err.message || 'Could not send reset email');
+      });
+  }
 
-/* AUTH GUARD for dashboard.html (only allow logged users) */
-(function attachAuthGuard() {
-  // Only run after DOM ready
+  /* LOGOUT */
+  function logout() {
+    if (!window.auth) { console.warn('Firebase not initialized'); return; }
+    auth.signOut()
+      .then(() => {
+        window.location.href = 'login.html';
+      })
+      .catch(err => {
+        alert('Logout failed: ' + (err.message || err));
+      });
+  }
+
+  /* AUTH GUARD */
   document.addEventListener('DOMContentLoaded', () => {
-    // If no auth, don't attempt to guard (helps with dev)
     if (!window.auth) {
       console.warn('auth.js: Firebase auth not available');
       return;
     }
 
-    // Common handler: update UI if dashboard contains user elements
     window.auth.onAuthStateChanged(user => {
-      // If on dashboard page and no user -> redirect to login
-      if (document.body && document.body.classList && document.querySelector('.dashboard')) {
-        if (!user) {
-          window.location.href = 'login.html';
-          return;
-        }
-        // show user's email on dashboard
-        const ue = document.getElementById('userEmail');
-        if (ue) ue.textContent = user.email;
+      // dashboard guard: if on dashboard and NOT logged -> redirect to login
+      const path = window.location.pathname.split('/').pop().toLowerCase();
+      const isDashboard = path === 'dashboard.html';
+      if (isDashboard && !user) {
+        window.location.href = 'login.html';
+        return;
       }
 
-      // If on index/login/signup/forgot pages and user is logged in -> redirect to dashboard
-      const path = window.location.pathname.split('/').pop().toLowerCase();
+      // show email in dashboard
+      const ue = document.getElementById('userEmail');
+      if (ue && user) ue.textContent = user.email;
+
+      // if user is logged and on a public page -> redirect to dashboard
       const publicPages = ['index.html','login.html','signup.html','forgot.html',''];
       if (user && publicPages.includes(path)) {
-        // prevent infinite loop if already on dashboard
-        if (window.location.href.indexOf('dashboard.html') === -1) {
+        if (!window.location.href.includes('dashboard.html')) {
           window.location.href = 'dashboard.html';
         }
       }
     });
   });
-})();
 
-/* Expose functions to global scope so inline handlers can call them */
-window.signup = signup;
-window.login = login;
-window.forgotPassword = forgotPassword;
-window.logout = logout;
+  // expose globally
+  window.signup = signup;
+  window.login = login;
+  window.forgotPassword = forgotPassword;
+  window.logout = logout;
+
+})();
