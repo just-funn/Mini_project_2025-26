@@ -47,7 +47,7 @@ body{
 .nav-actions a{margin-left:12px}
 
 /* Buttons */
-.btn{display:inline-flex;align-items:center;gap:10px;border-radius:12px;padding:10px 16px;border:0;cursor:pointer;font-weight:700;outline:none;transition:transform 200ms,var(--shadow) 200ms}
+.btn{display:inline-flex;align-items:center;gap:10px;border-radius:12px;padding:10px 16px;border:0;cursor:pointer;font-weight:700;outline:none;transition:transform 200ms,var(--shadow) 200ms;text-decoration: none;}
 .btn:active{transform:translateY(1px)}
 .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04); color:var(--text)}
 .btn-primary{background:linear-gradient(90deg,var(--primary),var(--accent)); color:#02101a; box-shadow: 0 10px 30px rgba(30,144,255,0.12)}
