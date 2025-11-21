@@ -39,7 +39,12 @@
     </div>
   </div>
 
-  <script src="js/auth.js"></script>
+  <!-- new UI micro-interactions (animations, ripple, parallax) -->
+<script src="js/ui.js"></script>
+
+<!-- keep this after ui.js so auth handlers still work -->
+<script src="js/auth.js"></script>
+
   <script>
     // attach login handler
     document.getElementById('loginBtn').addEventListener('click', () => {

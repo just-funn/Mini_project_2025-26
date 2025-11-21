@@ -45,7 +45,12 @@
     </main>
   </div>
 
-  <script src="js/auth.js"></script>
+  <!-- new UI micro-interactions (animations, ripple, parallax) -->
+<script src="js/ui.js"></script>
+
+<!-- keep this after ui.js so auth handlers still work -->
+<script src="js/auth.js"></script>
+
   <script>
     // Dashboard-specific behaviors
     document.getElementById('logoutBtn').addEventListener('click', () => {
